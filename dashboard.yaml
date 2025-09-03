@@ -1,0 +1,39 @@
+type: grid
+cards:
+  - type: todo-list
+    entity: todo.gefriertruhe_2
+    display_order: duedate_asc
+    grid_options:
+      columns: 12
+      rows: 7
+    hide_create: true
+  - type: tile
+    entity: todo.gefriertruhe_2
+    features_position: bottom
+  - type: tile
+    entity: input_number.eingefroren_id
+    features_position: bottom
+  - type: entities
+    title: ""
+    show_header_toggle: false
+    state_color: false
+    grid_options:
+      columns: 12
+      rows: 2
+    entities:
+      - entity: input_select.speisen
+        name: Speise wählen
+      - type: call-service
+        name: Einfrieren
+        icon: mdi:snowflake
+        action_name: Start
+        service: script.gefriertruhe_eintrag_anlegen_id_erhohen
+  - type: tile
+    entity: input_text.last_qr_scn_gefriertruhe
+    features_position: bottom
+    vertical: false
+    grid_options:
+      columns: 12
+      rows: 1
+    name: "Letzter Scan (Barcode, QR, ...) "
+column_span: 2
