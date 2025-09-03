@@ -1,4 +1,4 @@
-# Gefriertruhe-Workflow (Home Assistant):
+# Gefriertruhen-Workflow (Home Assistant):
 
 Dieses Projekt stellt ein **Home‑Assistant‑Dashboard** in den Mittelpunkt, mit dem du deine Gefriertruhe komfortabel mit **eigenen Speisen** füllst. Über die Oberfläche wählst du Gerichte (oder trägst neue ein); **Einfrierdatum**, **fortlaufende ID** und **Fälligkeitsdatum** werden automatisch gesetzt und die Einträge landen in einer **To‑do‑Liste**. Der **Webhook** zum Erfassen **gekaufter Produkte** ist ein optionales **Add‑on** und kann bei Bedarf zusätzlich aktiviert werden.
 
