@@ -1,0 +1,31 @@
+alias: Gescanntes Produkt eintragen
+description: Webhook vom Handy-Scanner
+triggers:
+  - trigger: webhook
+    webhook_id: barcode_scan_p
+    local_only: false
+    allowed_methods:
+      - POST
+      - PUT
+conditions: []
+actions:
+  - action: logbook.log
+    data:
+      name: Scan
+      message: "{{ trigger.json.code }}"
+  - action: input_text.set_value
+    data:
+      value: >-
+        {{ trigger.json.code + " :: " + (trigger.json.product | default('',
+        true) ) }}
+    target:
+      entity_id: input_text.last_qr_scn_gefriertruhe
+  - action: script.turn_on
+    metadata: {}
+    target:
+      entity_id: script.gefriertruhe_eintrag_anlegen_id_erhohen
+    data:
+      variables:
+        speise: "{{ trigger.json.product | default(trigger.json.code, true) }}"
+mode: single
+
