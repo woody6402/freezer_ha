@@ -13,6 +13,27 @@ cards:
   - type: tile
     entity: input_number.eingefroren_id
     features_position: bottom
+  - type: tile
+    entity: input_text.last_qr_scn_gefriertruhe
+    features_position: bottom
+    vertical: false
+    grid_options:
+      columns: 9
+      rows: 1
+    name: "Letzter Scan (Barcode, QR, ...) "
+    icon: mdi:barcode-scan
+  - show_name: false
+    show_icon: true
+    type: button
+    icon: mdi:qrcode-scan
+    show_state: false
+    tap_action:
+      action: url
+      url_path: /local/scanner_20.html
+    name: Gefriertruhe
+    grid_options:
+      columns: 3
+      rows: 1
   - type: entities
     title: ""
     show_header_toggle: false
@@ -28,12 +49,4 @@ cards:
         icon: mdi:snowflake
         action_name: Start
         service: script.gefriertruhe_eintrag_anlegen_id_erhohen
-  - type: tile
-    entity: input_text.last_qr_scn_gefriertruhe
-    features_position: bottom
-    vertical: false
-    grid_options:
-      columns: 12
-      rows: 1
-    name: "Letzter Scan (Barcode, QR, ...) "
 column_span: 2
