@@ -1,5 +1,13 @@
 # ============================
 # Gefriertruhe: Komplett-Config (für configuration.yaml)
+#
+# Core requirement: Overview of home-cooked frozen food and expiry dates.
+# Every two weeks, more food is prepared at the weekend and ends up in the freezer, thus disappearing from view.
+# When freezing, 3-5 new boxes should be recorded (freezing date today, expiry date standard 4 months).
+# Selectable from a standard list, but can be edited afterwards.
+# Currently, there is also a web front end (experimental) that allows you to scan a product's barcode 
+# and send it to the list.
+#
 # - Local todo Integration: https://www.home-assistant.io/integrations/local_todo
 # - Helper (input_*)
 # - Script (Eintrag anlegen & ID +1)
