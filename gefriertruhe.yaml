@@ -1,5 +1,6 @@
 # ============================
 # Gefriertruhe: Komplett-Config (für configuration.yaml)
+# - Local todo Integration: https://www.home-assistant.io/integrations/local_todo
 # - Helper (input_*)
 # - Script (Eintrag anlegen & ID +1)
 # - (Optional) Webhook-Automation als Add-on
