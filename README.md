@@ -1,7 +1,6 @@
 # Gefriertruhe-Workflow (Home Assistant):
 
-Dieses Projekt verbindet einen Handy-Barcode/QR-Scanner mit Home Assistant (HA), um Lebensmittel in einer **To-do-Liste** zu erfassen.  
-Ein Scan löst einen **Webhook** aus, der automatisch einen Eintrag mit Datum, fortlaufender ID und Fälligkeitsdatum erstellt und ihn in einer To-do-Liste ablegt. Ein kleines Dashboard macht die Bedienung bequem.
+Dieses Projekt stellt ein **Home‑Assistant‑Dashboard** in den Mittelpunkt, mit dem du deine Gefriertruhe komfortabel mit **eigenen Speisen** füllst. Über die Oberfläche wählst du Gerichte (oder trägst neue ein); **Einfrierdatum**, **fortlaufende ID** und **Fälligkeitsdatum** werden automatisch gesetzt und die Einträge landen in einer **To‑do‑Liste**. Der **Webhook** zum Erfassen **gekaufter Produkte** ist ein optionales **Add‑on** und kann bei Bedarf zusätzlich aktiviert werden.
 
 ---
 
