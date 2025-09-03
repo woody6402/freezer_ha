@@ -1,0 +1,98 @@
+# ============================
+# Gefriertruhe: Komplett-Config (für configuration.yaml)
+# - Helper (input_*)
+# - Script (Eintrag anlegen & ID +1)
+# - (Optional) Webhook-Automation als Add-on
+# Hinweis: Die Lovelace-Dashboard-Ansicht kann NICHT direkt in configuration.yaml gepflegt werden.
+#          Nutze dafür den Dashboard-Editor (UI) ODER YAML-Mode + separate Datei.
+# ============================
+
+# ---------- Helper ----------
+input_number:
+  eingefroren_id:
+    name: Eingefroren ID
+    initial: 1
+    min: 1
+    max: 9999
+    step: 1
+    mode: box
+
+input_text:
+  last_qr_scn_gefriertruhe:
+    name: Letzter Scan (Barcode, QR, …)
+    max: 255
+
+input_select:
+  speisen:
+    name: Speisen
+    options:
+      - Rindsgulasch (2 Portionen)
+      - Chili con Carne (3 Portionen)
+      - Lasagne (1 Blech)
+      - Bolognese (4 Portionen)
+      # Ergänze hier deine eigenen Speisen …
+
+# ---------- Script ----------
+script:
+  gefriertruhe_eintrag_anlegen_id_erhohen:
+    alias: "Gefriertruhe: Eintrag anlegen & ID erhöhen"
+    mode: single
+    fields:
+      speise:
+        name: Speise
+        description: Name der Speise (leer => Auswahl aus input_select.speisen)
+        required: false
+        selector:
+          text:
+    sequence:
+      - variables:
+          _id: "{{ states('input_number.eingefroren_id') | int }}"
+          _speise: >-
+            {{ speise if speise is not none and speise | trim != '' else states('input_select.speisen') }}
+          _today_str: "{{ now().strftime('%d.%m.%Y') }}"
+          _due_date: "{{ (now() + timedelta(days=120)).date() }}"
+      - service: todo.add_item
+        target:
+          entity_id: todo.gefriertruhe_2   # Passe ggf. deine To-do-Liste an
+        data:
+          item: "{{ _speise }}"
+          due_date: "{{ _due_date }}"
+          description: "{{ _id }} (eingefroren am {{ _today_str }})"
+      - service: input_number.set_value
+        target:
+          entity_id: input_number.eingefroren_id
+        data:
+          value: "{{ _id + 1 }}"
+
+# ---------- (Optional) Add-on: Webhook-Automation ----------
+# Aktivieren, wenn du Barcode/QR-Scans per Handy-App an Home Assistant senden willst.
+automation:
+  - id: gefriertruhe_webhook_addon
+    alias: "Gefriertruhe: Gekaufte Produkte (Webhook-Add-on)"
+    mode: single
+    trigger:
+      - platform: webhook
+        webhook_id: barcode_scan_p
+    action:
+      - variables:
+          _code: "{{ trigger.json.code | default('') }}"
+          _product: "{{ trigger.json.product | default('') }}"
+          _speise: "{{ _product if _product | trim != '' else _code }}"
+      - service: input_text.set_value
+        target:
+          entity_id: input_text.last_qr_scn_gefriertruhe
+        data:
+          value: "{{ _code }} :: {{ _product }}"
+      - service: logbook.log
+        data:
+          name: "Scan"
+          message: "{{ _code }}"
+          entity_id: input_text.last_qr_scn_gefriertruhe
+      - service: script.gefriertruhe_eintrag_anlegen_id_erhohen
+        data:
+          speise: "{{ _speise }}"
+
+# ---------- Dashboard-Hinweis ----------
+# Die mitgelieferte dashboard.yaml (Grid/Tiles/Entities/Todo-List) bitte via UI nachbauen
+# ODER im YAML-Mode als separate Datei einbinden (z. B. lovelace: dashboards: … filename: dashboards/gefriertruhe.yaml).
+# Der eigentliche View-YAML kann nicht innerhalb der configuration.yaml liegen.
