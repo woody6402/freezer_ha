@@ -26,10 +26,10 @@ input_select:
   speisen:
     name: Speisen
     options:
-      - Rindsgulasch (2 Portionen)
-      - Chili con Carne (3 Portionen)
-      - Lasagne (1 Blech)
-      - Bolognese (4 Portionen)
+      - Rindsgulasch 
+      - Chili con Carne 
+      - Lasagne 
+      - Bolognese 
       # Ergänze hier deine eigenen Speisen …
 
 # ---------- Script ----------
