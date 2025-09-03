@@ -1,5 +1,5 @@
 # ============================
-# Gefriertruhe: Komplett-Config (für configuration.yaml)
+# freezer_ha: (parts suitable for configuration.yaml)
 #
 # Core requirement: Overview of home-cooked frozen food and expiry dates.
 # Every two weeks, more food is prepared at the weekend and ends up in the freezer, thus disappearing from view.
