@@ -46,7 +46,7 @@ Dieses Projekt nutzt ein **Home-Assistant-Dashboard**, mit dem du deine Gefriert
 
 | Typ            | Name (Vorschlag)          | Entity-ID                         | Zweck |
 |----------------|---------------------------|-----------------------------------|------|
-| **To-do-Liste** (Helper) | Gefriertruhe 2               | `todo.gefriertruhe_2`             | Ziel-Liste für neue Einträge |
+| **To-do-Liste** (local to do Erweiterung) | Gefriertruhe 2               | `todo.gefriertruhe_2`             | Ziel-Liste für neue Einträge |
 | **Zahl**       | Eingefroren ID             | `input_number.eingefroren_id`     | fortlaufende ID (wird automatisch erhöht) |
 | **Auswahl**    | Speisen                    | `input_select.speisen`            | vordefinierte Speisen für manuelles Anlegen |
 | **Text**       | Letzter Scan (Barcode, QR, …) | `input_text.last_qr_scn_gefriertruhe` | Anzeige des letzten Scan-Payloads (nur fürs Add-on) |
@@ -80,10 +80,10 @@ input_select:
   speisen:
     name: Speisen
     options:
-      - Rindsgulasch (2 Portionen)
-      - Chili con Carne (3 Portionen)
-      - Lasagne (1 Blech)
-      - Bolognese (4 Portionen)
+      - Rindsgulasch 
+      - Chili con Carne 
+      - Lasagne 
+      - Bolognese 
 ```
 
 > **Hinweis zur To-do-Liste:**  
@@ -94,7 +94,7 @@ input_select:
 ## Installation
 
 1. **Dateien übernehmen**  
-   - Inhalte aus diesem Repo (Scripts, Automationen, Dashboard-Beispiel) in dein HA-Setup kopieren.
+   - Inhalte aus diesem Repo (Scripts, Automationen, Dashboard-Beispiel) in dein HA-Setup übernehmen:
 2. **Script importieren**  
    - Inhalt von [`add_entry_script.yaml`](./add_entry_script.yaml) in **Einstellungen → Automationen & Szenen → Skripte** importieren oder in `scripts.yaml` einfügen.
 3. **Helper anlegen** (siehe oben).
