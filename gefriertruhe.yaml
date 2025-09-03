@@ -103,7 +103,7 @@ automation:
         data:
           speise: "{{ _speise }}"
 
-# ---------- Dashboard-Hinweis ----------
-# Die mitgelieferte dashboard.yaml (Grid/Tiles/Entities/Todo-List) bitte via UI nachbauen
-# ODER im YAML-Mode als separate Datei einbinden (z. B. lovelace: dashboards: … filename: dashboards/gefriertruhe.yaml).
-# Der eigentliche View-YAML kann nicht innerhalb der configuration.yaml liegen.
+# ---------- Dashboard note ----------
+# Please recreate the supplied dashboard.yaml (Grid/Tiles/Entities/Todo-List) via the UI
+# OR integrate it as a separate file in YAML mode (e.g. lovelace: dashboards).
+# The actual view YAML cannot be located within configuration.yaml.
