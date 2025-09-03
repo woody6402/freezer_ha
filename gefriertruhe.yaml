@@ -10,10 +10,11 @@
 #
 # - Local todo Integration: https://www.home-assistant.io/integrations/local_todo
 # - Helper (input_*)
-# - Script (Eintrag anlegen & ID +1)
-# - (Optional) Webhook-Automation als Add-on
-# Hinweis: Die Lovelace-Dashboard-Ansicht kann NICHT direkt in configuration.yaml gepflegt werden.
-#          Nutze dafür den Dashboard-Editor (UI) ODER YAML-Mode + separate Datei.
+# - Script (add todo list entry & ID +1)
+# - (Optional) Webhook-Automation as Add-on
+#
+# Note: The Lovelace dashboard view CANNOT be maintained directly in configuration.yaml.
+#          Use the dashboard editor (UI) OR YAML mode + separate file for this purpose.
 # ============================
 
 # ---------- Helper ----------
@@ -39,7 +40,7 @@ input_select:
       - Chili con Carne 
       - Lasagne 
       - Bolognese 
-      # Ergänze hier deine eigenen Speisen …
+      # add you favoured dishes here
 
 # ---------- Script ----------
 script:
