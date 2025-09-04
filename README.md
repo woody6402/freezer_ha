@@ -56,6 +56,7 @@ It is **experimental** and meant as an add-on:
 -   Includes optional product lookup using [Open Food
     Facts](https://openfoodfacts.org)
 -   Beware: only webhook is tested ....
+-   also browsers may only allow camera usage when using https:// 
 
 ### Usage
 
