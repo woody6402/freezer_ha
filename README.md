@@ -1,4 +1,4 @@
-# Gefriertruhe -- Home Assistant 
+# Freezer Content -- Home Assistant 
 
 This repository contains configuration files and dashboards for managing
 a freezer ("Gefriertruhe") in **Home Assistant**.\
