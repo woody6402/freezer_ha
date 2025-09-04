@@ -79,6 +79,8 @@ It is **experimental** and meant as an add-on:
 
 -   The scanner is experimental, some devices/browsers may not support
     all features (e.g. torch).
+        - tried with Laptop, Moto 50 Handy, Samsung Flip Handy.
+        - is not running on some fires with missing auto focus
 -   You can extend the food list in `input_select.speisen` with your own
     entries.
 -   The `todo.gefriertruhe_2` entity in the config must match your own
