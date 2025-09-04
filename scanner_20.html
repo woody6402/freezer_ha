@@ -1,0 +1,652 @@
+<!-- This barcode web scanner is experimental and was mostly generated with KI help !!!  -->
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>QR/Barcode Scanner → HA + Produktname (AT‑tuned) 0.81 — HA Look</title>
+  <!-- Optional: Roboto für Home-Assistant-Feeling -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    /* —— Home‑Assistant‑nahes Theme (ohne Layout-/Funktionsänderungen) —— */
+    :root{
+      /* HA-ähnliche Variablen + Fallbacks */
+      --primary-color:#41BDF5;
+      --accent-color:var(--primary-color);
+      --text-primary-color:#E6EAF0;
+      --secondary-text-color:#9AA7B5;
+      --primary-background-color:#111418;
+      --secondary-background-color:#161B21;
+      --card-background-color:#1A2028;
+      --ha-card-border-radius:12px;
+      --divider-color:#2A333D;
+      --state-success-color:#0DAE6B;
+      --warning-color:#F0C419;
+      --error-color:#E6522C;
+
+      /* Mapping auf bestehende Variablen im Code */
+      --bg:var(--primary-background-color);
+      --card:var(--card-background-color);
+      --muted:var(--secondary-text-color);
+      --accent:var(--accent-color);
+      --ok:var(--state-success-color);
+      --warn:var(--warning-color);
+      --err:var(--error-color);
+    }
+
+    /* Light-Mode Anmutung im HA-Stil (automatisch wenn System auf hell gestellt) */
+    @media (prefers-color-scheme: light){
+      :root{
+        --text-primary-color:#1B232C;
+        --secondary-text-color:#5A6A78;
+        --primary-background-color:#F6F8FB;
+        --secondary-background-color:#FFFFFF;
+        --card-background-color:#FFFFFF;
+        --divider-color:#E2E8F0;
+        --error-color:#D64545;
+      }
+    }
+
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;background:var(--bg);color:var(--text-primary-color);font-family:Roboto,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif}
+
+    .wrap{max-width:1100px;margin:0 auto;padding:16px}
+    header{display:flex;gap:12px;align-items:center;justify-content:space-between;margin-bottom:12px}
+    h1{font-size:1.1rem;margin:0;color:var(--text-primary-color);font-weight:600}
+
+    .badge{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:rgba(65,189,245,.10);border:1px solid var(--divider-color);font-size:.87rem;color:var(--secondary-text-color)}
+
+    .card{background:var(--card);border-radius:var(--ha-card-border-radius);padding:14px;border:1px solid var(--divider-color);box-shadow:0 6px 16px rgba(0,0,0,.25)}
+
+    .row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+    label{font-size:.9rem;color:var(--muted);display:block}
+
+    input,select,button,textarea{background:var(--secondary-background-color);color:var(--text-primary-color);border:1px solid var(--divider-color);border-radius:12px;padding:10px 12px;font-size:1rem}
+    input::placeholder,textarea::placeholder{color:var(--muted);opacity:.9}
+
+    button{cursor:pointer;transition:filter .15s ease,transform .05s ease,border-color .15s ease}
+    button:hover{filter:brightness(1.06)}
+    button:active{transform:translateY(1px)}
+    button.primary{background:var(--accent-color);border-color:var(--accent-color);color:#0b1117;font-weight:700}
+    button.ghost{background:transparent;border-color:var(--divider-color)}
+
+    .inline{display:inline-flex;gap:8px;align-items:center}
+    .muted{color:var(--muted)}
+    .spacer{height:8px}
+
+    .item .ts{ font-size:.75rem; line-height:1.1; margin-bottom:4px; color:var(--muted); }
+    .item .main{ line-height:1.35; }
+    .pill{display:inline-block;border:1px solid var(--divider-color);background:rgba(255,255,255,.03);border-radius:999px;padding:2px 8px;margin-left:6px;font-size:.85rem}
+
+    .grid{ display:grid; gap:12px; grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+      grid-template-areas: "scan recent" "cfg cfg" "info info"; }
+    #scannerCard{grid-area:scan}
+    #recentCard{grid-area:recent}
+    #cfg{grid-area:cfg}
+    #info{grid-area:info}
+
+    #video{ width:100%; max-width:100%; border-radius:14px; background:#000; aspect-ratio:3/4; display:block; margin:0 auto; transition: box-shadow .18s, outline-color .18s; box-sizing:border-box; }
+    #video.hit-red{ outline:4px solid var(--error-color); outline-offset:-4px; }
+
+    .list{max-height:42vh; overflow:auto; border:1px dashed var(--divider-color); border-radius:12px; padding:8px; background:var(--secondary-background-color)}
+    .item{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;background:var(--secondary-background-color);border:1px solid var(--divider-color);border-radius:10px;margin:6px 0}
+    .item code{font-family:ui-monospace,Menlo,Consolas,monospace;background: var(--secondary-background-color);
+  color: var(--text-primary-color);padding:4px 6px;border-radius:8px;border:1px solid var(--divider-color)}
+    
+
+    details.card{position:relative}
+    details.card > summary{cursor:pointer;list-style:none;font-weight:600;color:var(--text-primary-color);}
+    details.card[open] > summary{border-bottom:1px solid var(--divider-color);padding-bottom:8px;margin-bottom:8px}
+
+    /* Fokus sichtbar wie in HA */
+    :where(input,select,button,textarea):focus-visible{outline:2px solid var(--accent-color);outline-offset:2px}
+
+    /* System-Checkboxen farblich an HA anpassen, ohne Custom-Layout */
+    input[type="checkbox"]{accent-color:var(--accent-color)}
+
+    @media (max-width:480px){ .wrap{padding:12px} .list{max-height:38vh} }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>📷 QR/Barcode Scanner → Home Assistant + Produktname (AT‑tuned) 0.81</h1>
+      <span class="badge" id="status"><span>⏸</span> <strong>inaktiv</strong></span>
+    </header>
+
+    <div class="grid">
+      <!-- Kamera / Scanner -->
+      <div class="card" id="scannerCard">
+        <div class="row" style="justify-content:space-between;margin-bottom:8px">
+          <div class="inline">
+            <button id="btnStart" class="primary">Start</button>
+            <button id="btnStop" class="ghost">Stop</button>
+            <button id="btnTorch" class="ghost" title="Taschenlampe">🔦</button>
+          </div>
+          <div class="inline">
+            <label for="selCam">Kamera</label>
+            <select id="selCam"></select>
+          </div>
+        </div>
+
+        <video id="video" muted playsinline></video>
+
+        <div class="spacer"></div>
+
+      </div>
+
+      <!-- Letzte Scans -->
+      <div class="card" id="recentCard">
+        <h3 style="margin-top:0">Letzte Scans</h3>
+        <div class="list" id="list"></div>
+        <div class="row">
+          <button id="btnCopy" class="ghost">Alles kopieren</button>
+          <button id="btnClear" class="ghost">Liste leeren</button>
+        </div>
+      </div>
+
+      <!-- Config (einklappbar) -->
+      <details class="card" id="cfg" open>
+        <summary>⚙️ Home Assistant & Produktdaten</summary>
+        <div class="row" style="margin-top:8px">
+          <label class="inline"><input type="checkbox" id="chkAutoSend"/> Automatisch an HA senden</label>
+          <label class="inline"><input type="checkbox" id="chkLookup" checked/> Produktname online ermitteln (Open Food Facts)</label>
+          <label class="inline"><input type="checkbox" id="chkDedup" checked/> Doppelte in 15s ignorieren</label>
+          <label class="inline"><input type="checkbox" id="chkSound" checked/> Ton/Vibration</label>
+        </div>
+        <div class="spacer"></div>
+        <div class="row">
+          <label style="flex:1">
+            Webhook-URL (empfohlen)
+            <input id="inpWebhook" type="url" placeholder="https://…/api/webhook/DEIN_ID" />
+          </label>
+        </div>
+        <div class="row">
+          <label style="flex:1">
+            Oder: HA-Basis-URL (für REST-API)
+            <input id="inpBaseUrl" type="url" placeholder="https://homeassistant.local:8123" />
+          </label>
+        </div>
+        <div class="row">
+          <label style="flex:1">
+            Long-Lived Token (optional, nur für REST)
+            <input id="inpToken" type="password" placeholder="eyJ0eXAiOiJK…" />
+          </label>
+        </div>
+        <div class="row">
+          <label style="flex:1">
+            Service (REST): domain.service
+            <input id="inpService" type="text" value="input_text.set_value" />
+          </label>
+          <label style="flex:1">
+            Ziel-Entity (REST)
+            <input id="inpEntity" type="text" placeholder="input_text.last_scan" />
+          </label>
+        </div>
+        <div class="row">
+          <label style="flex:1">
+            Eigener Produkt‑Lookup (optional)
+            <input id="inpCustomLookup" type="url" placeholder="https://…/lookup?code={code}" />
+          </label>
+        </div>
+        <div class="row">
+          <button id="btnTestSend" class="ghost">Test an HA senden</button>
+          <span class="muted" id="sendStatus"></span>
+        </div>
+        <p class="muted" style="margin-top:8px">
+          Tipp: Lege die Datei in Home Assistant unter <code>/config/www/</code> ab und öffne sie über <code>/local/</code>, damit Kamera & CORS sicher funktionieren (z. B. <code>https://homeassistant.local:8123/local/scanner.html</code>).
+        </p>
+        <p class="muted" style="margin-top:8px">
+          Produktdaten: Standard ist <em>Open Food Facts</em> (global). Fallback auf <em>de.openfoodfacts.org</em>. Zusätzlich kannst du einen eigenen Lookup‑Endpoint angeben (siehe Hilfe).
+        </p>
+      </details>
+
+      <!-- Info (einklappbar) -->
+      <details class="card" id="info">
+        <summary>Hilfe & Hinweise</summary>
+        <ul>
+          <li>Scanner: <em>@zxing/library</em> für QR + gängige Barcodes (EAN/UPC/Code128/Code39…).</li>
+          <li>Produkt‑Suche: Zuerst eigener Lookup (optional), dann Open Food Facts v2 (<code>/api/v2/product/{code}.json</code>), Fallback <code>de.openfoodfacts.org</code> und OFF v0.</li>
+          <li>Open Food Facts ist community‑basiert. Fehlt ein Produkt, kann man es dort hinzufügen – danach findet es die App.</li>
+          <li>Webhook‑JSON: <code>{ code, product, brand, dish, ts, type }</code>. REST: <code>input_text.set_value</code> mit <code>{ entity_id, value }</code>.</li>
+          <li>Alle Einstellungen (inkl. Produkt‑Cache) werden lokal auf dem Gerät gespeichert.</li>
+        </ul>
+      </details>
+    </div>
+
+    <p class="muted" style="text-align:center;margin:16px 0">Made for HA-Workflows · © Woody64 + Produkt-Lookup Add‑on (AT‑tuned)</p>
+  </div>
+
+  <!-- ZXing -->
+  <script src="https://unpkg.com/@zxing/library@0.20.0"></script>
+  <script>
+    // --- State / Elemente ---
+    const els = {
+      video: document.getElementById('video'),
+      selCam: document.getElementById('selCam'),
+      btnStart: document.getElementById('btnStart'),
+      btnStop: document.getElementById('btnStop'),
+      btnTorch: document.getElementById('btnTorch'),
+      status: document.getElementById('status'),
+      list: document.getElementById('list'),
+      chkAutoSend: document.getElementById('chkAutoSend'),
+      chkLookup: document.getElementById('chkLookup'),
+      chkDedup: document.getElementById('chkDedup'),
+      chkSound: document.getElementById('chkSound'),
+      inpWebhook: document.getElementById('inpWebhook'),
+      inpBaseUrl: document.getElementById('inpBaseUrl'),
+      inpToken: document.getElementById('inpToken'),
+      inpService: document.getElementById('inpService'),
+      inpEntity: document.getElementById('inpEntity'),
+      inpCustomLookup: document.getElementById('inpCustomLookup'),
+      btnTestSend: document.getElementById('btnTestSend'),
+      sendStatus: document.getElementById('sendStatus'),
+      btnCopy: document.getElementById('btnCopy'),
+      btnClear: document.getElementById('btnClear'),
+      selDish: document.getElementById('selDish'),
+    };
+
+    let codeReader = null;
+    let currentDeviceId = null;
+    let streamTrack = null;   // für Torch
+    let scanControls = null;  // ZXing Controls
+    let activeStream = null;  // gesamter Stream
+    let audioCtx = null;
+    let lastValue = '';
+    let lastTime = 0;
+    const ignItemT = 15000; // 15s Dedupe
+
+    // einfacher Produkt-Cache
+    const prodCacheKey = 'scannerProductCache';
+    const productCache = loadProdCache();
+
+    function setBadge(active, txt){
+      els.status.innerHTML = active ? `✅ <strong>${txt||'läuft'}</strong>` : `⏸ <strong>${txt||'inaktiv'}</strong>`;
+    }
+
+    function saveSettings(){
+      const s = {
+        webhook: els.inpWebhook.value.trim(),
+        baseUrl: els.inpBaseUrl.value.trim(),
+        token: els.inpToken.value.trim(),
+        service: els.inpService.value.trim(),
+        entity: els.inpEntity.value.trim(),
+        autoSend: els.chkAutoSend.checked,
+        lookup: els.chkLookup.checked,
+        dedup: els.chkDedup.checked,
+        sound: els.chkSound.checked,
+        cam: els.selCam.value,
+        dish: (els.selDish?.value || ''),
+        customLookup: els.inpCustomLookup.value.trim(),
+      };
+      localStorage.setItem('scannerSettings', JSON.stringify(s));
+      saveProdCache();
+    }
+    function loadSettings(){
+      try{
+        const s = JSON.parse(localStorage.getItem('scannerSettings'))||{};
+        els.inpWebhook.value = s.webhook||'/api/webhook/barcode_scan_p';
+        els.inpBaseUrl.value = s.baseUrl||'';
+        els.inpToken.value = s.token||'';
+        els.inpService.value = s.service||'input_text.set_value';
+        els.inpEntity.value = s.entity||'';
+        els.chkAutoSend.checked = !!s.autoSend;
+        els.chkLookup.checked = s.lookup !== false; // default: an
+        els.chkDedup.checked = s.dedup!==false;
+        els.chkSound.checked = s.sound!==false;
+        if(s.cam) currentDeviceId = s.cam;
+        if('dish' in s && els.selDish) els.selDish.value = s.dish||'';
+        els.inpCustomLookup.value = s.customLookup||'';
+      }catch(e){}
+    }
+
+    function loadProdCache(){
+      try{ return JSON.parse(localStorage.getItem(prodCacheKey))||{}; }catch(e){ return {}; }
+    }
+    function saveProdCache(){
+      try{
+        // keep max 200 Einträge
+        const keys = Object.keys(productCache);
+        if(keys.length>220){
+          const rm = keys.slice(0, keys.length-200);
+          for(const k of rm) delete productCache[k];
+        }
+        localStorage.setItem(prodCacheKey, JSON.stringify(productCache));
+      }catch(e){}
+    }
+
+    function beep(){
+      if(!els.chkSound.checked) return;
+      try{
+        if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+        const o = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        o.connect(g); g.connect(audioCtx.destination);
+        o.type='triangle'; o.frequency.value=880;
+        o.start();
+        g.gain.setValueAtTime(0.0001, audioCtx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.3, audioCtx.currentTime+0.02);
+        g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime+0.18);
+        o.stop(audioCtx.currentTime+0.2);
+      }catch(e){}
+      if(navigator.vibrate && els.chkSound.checked) navigator.vibrate(80);
+    }
+
+    function escapeHtml(s){return s.replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[c]));}
+
+    function addItem(code, dish, productInfo){
+      const ts = new Date().toISOString();
+      const div = document.createElement('div');
+      div.className='item';
+      div.dataset.code = code;
+      const dishHtml = dish ? ` <span class="muted">– ${escapeHtml(dish)}</span>` : '';
+      const productHtml = productInfo && productInfo.product
+        ? ` <span class="pill">${escapeHtml(productInfo.product)}</span>`
+        : ` <span class="pill" data-role="prod-pill" style="opacity:.8">🔎 Produkt…</span>`;
+      div.innerHTML = `<div><div class="muted ts">${ts}</div><div class="main"><code>${escapeHtml(code)}</code>${dishHtml}${productHtml}</div></div>`+
+        `<div class="inline"><button title="kopieren">📋</button><button title="löschen">✖</button></div>`;
+      const [btnCopy, btnDel] = div.querySelectorAll('button');
+      btnCopy.addEventListener('click',()=>navigator.clipboard.writeText(composeValueString(code, dish, productInfo?.product)));
+      btnDel.addEventListener('click',()=>div.remove());
+      els.list.prepend(div);
+      return div;
+    }
+
+    async function copyAll(){
+      const vals = Array.from(els.list.querySelectorAll('.item')).map((div)=>{
+        const code = div.dataset.code||'';
+        const dish = div.querySelector('span.muted')?.textContent?.replace(/^\s*–\s*/, '') || '';
+        const pill = div.querySelector('[data-role="prod-pill"], .pill');
+        let product='';
+        if(pill && !pill.dataset.role) product = pill.textContent||''; // echte Produkt-Pill (ohne data-role)
+        return composeValueString(code, dish, product);
+      }).join('\n');
+      try{ await navigator.clipboard.writeText(vals); toast('Kopiert'); }catch(e){ toast('Konnte nicht kopieren'); }
+    }
+
+    function composeValueString(code, dish, product){
+      const parts = [code];
+      if(product) parts.push(product);
+      if(dish) parts.push(dish);
+      return parts.join(' – ');
+    }
+
+    function toast(msg){ els.sendStatus.textContent = msg; setTimeout(()=>els.sendStatus.textContent='', 1500); }
+
+    async function listCams(){
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      const vids = devices.filter(d=>d.kind==='videoinput');
+      els.selCam.innerHTML = '';
+      for(const d of vids){
+        const opt = document.createElement('option');
+        opt.value = d.deviceId;
+        opt.textContent = d.label || `Kamera ${els.selCam.length+1}`;
+        els.selCam.appendChild(opt);
+      }
+      let targetId = currentDeviceId;
+      if(!targetId){
+        const back = vids.find(v=>/back|rear|rück|trás/i.test(v.label));
+        targetId = (back||vids[0])?.deviceId;
+      }
+      if(targetId){ els.selCam.value = targetId; currentDeviceId = targetId; }
+      saveSettings();
+    }
+
+    function cleanupStream(){
+      try{
+        const s = els.video.srcObject || activeStream;
+        if (s && s.getTracks) s.getTracks().forEach(t=>{ try{ t.stop(); }catch(e){} });
+      }catch(e){}
+      try{ els.video.srcObject = null; }catch(e){}
+      streamTrack = null;
+      activeStream = null;
+    }
+
+    async function start(){
+      await stop(); // alte Session sicher beenden
+      if(!window.ZXing){ alert('ZXing konnte nicht geladen werden. Internetverbindung prüfen.'); return; }
+      codeReader = new ZXing.BrowserMultiFormatReader();
+      setBadge(true,'läuft');
+      // Permission-Preflight sofort schließen
+      try{
+        const tmp = await navigator.mediaDevices.getUserMedia({video:true});
+        tmp.getTracks().forEach(t=>{ try{ t.stop(); }catch(e){} });
+      }catch(e){}
+      await listCams();
+      const deviceId = els.selCam.value;
+      currentDeviceId = deviceId;
+      saveSettings();
+
+      codeReader.decodeFromVideoDevice(deviceId, els.video, (result, err, controls)=>{
+        if (controls) scanControls = controls;
+        const stream = els.video.srcObject;
+        activeStream = stream;
+        streamTrack = stream && stream.getVideoTracks ? stream.getVideoTracks()[0] : null;
+        if(result){
+          const now = Date.now();
+          const value = result.getText();
+          const dish = (els.selDish?.value || '').trim();
+          if(els.chkDedup.checked && value===lastValue && (now-lastTime)<ignItemT){ return; }
+          lastValue = value; lastTime = now;
+          beep();
+          // roter Rahmen 1s
+          els.video.classList.remove('hit-red'); void els.video.offsetWidth;
+          els.video.classList.add('hit-red');
+          setTimeout(()=>els.video.classList.remove('hit-red'), 1000);
+
+          // Eintrag schon anlegen (mit Platzhalter-Pill), Lookup ggf. nachladen
+          const itemDiv = addItem(value, dish, null);
+          handleScan(value, dish, itemDiv).catch(()=>{});
+        }
+      });
+    }
+
+    async function stop(){
+      try{ scanControls && scanControls.stop && scanControls.stop(); }catch(e){}
+      scanControls = null;
+      try{ codeReader && codeReader.reset(); }catch(e){}
+      cleanupStream();
+      setBadge(false,'inaktiv');
+    }
+
+    async function toggleTorch(){
+      if(!streamTrack) return toast('Keine Kamera aktiv');
+      const caps = streamTrack.getCapabilities ? streamTrack.getCapabilities() : {};
+      if(!('torch' in caps)) return toast('Torch nicht unterstützt');
+      const settings = streamTrack.getSettings();
+      const on = !settings.torch;
+      try{
+        await streamTrack.applyConstraints({ advanced:[{ torch:on }] });
+        toast(on?'Licht an':'Licht aus');
+      }catch(e){ toast('Torch konnte nicht gesetzt werden'); }
+    }
+
+    async function handleScan(code, dish, itemDiv){
+      let productInfo = null;
+      if(els.chkLookup.checked && looksLikeRetailBarcode(code)){
+        productInfo = await getProductInfo(code).catch(()=>null);
+        // UI aktualisieren
+        if(itemDiv){ updateItemWithProduct(itemDiv, productInfo); }
+      } else {
+        // Platzhalter-Pill entfernen, wenn Lookup aus
+        if(itemDiv){ const ph = itemDiv.querySelector('[data-role="prod-pill"]'); if(ph) ph.remove(); }
+      }
+
+      if(els.chkAutoSend.checked){
+        try{ await sendToHA(code, dish, productInfo); toast('Gesendet'); }
+        catch(e){ toast('Senden fehlgeschlagen'); }
+      }
+    }
+
+    function updateItemWithProduct(div, productInfo){
+      const ph = div.querySelector('[data-role="prod-pill"]');
+      if(!ph) return;
+      if(productInfo && productInfo.product){
+        ph.removeAttribute('data-role');
+        ph.textContent = productInfo.product;
+        ph.style.opacity = '1';
+      }else{
+        ph.textContent = '— kein Eintrag —';
+        ph.style.opacity = '.7';
+      }
+    }
+
+    function looksLikeRetailBarcode(code){
+      // einfache Heuristik: nur Ziffern, Länge 8/12/13/14 (EAN/UPC)
+      return /^\d{8,14}$/.test(code);
+    }
+
+    async function getProductInfo(code){
+      // Cache zuerst
+      if(productCache[code]) return productCache[code];
+
+      // 0) Eigener Lookup (optional) – akzeptiert GET ?code=… oder POST {code}
+      const customUrl = (els.inpCustomLookup?.value||'').trim();
+      if(customUrl){
+        try{
+          const info = await fetchCustom(customUrl, code);
+          if(info && (info.product||info.brand)){ productCache[code] = info; saveProdCache(); return info; }
+        }catch(e){}
+      }
+
+      // OFF v2 (weltweit)
+      const makeInfo = (p)=>{
+        const name = (p.product_name_de || p.product_name || '').trim();
+        const brand = (p.brands || '').split(',')[0].trim();
+        const product = (brand? (brand+' '):'') + (name||'');
+        return { product: (product||'').trim() || null, brand: brand||null, source:'openfoodfacts' };
+      };
+
+      let info = await fetchOFF(`https://world.openfoodfacts.org/api/v2/product/${encodeURIComponent(code)}.json?fields=product_name,product_name_de,brands&lc=de`).catch(()=>null);
+      if(info && info.product){ productCache[code] = makeInfo(info.product); saveProdCache(); return productCache[code]; }
+
+      // v0 Fallback (DE-Instanz zuerst, dann world)
+      info = await fetchOFF(`https://de.openfoodfacts.org/api/v0/product/${encodeURIComponent(code)}.json`).catch(()=>null);
+      if(info && info.product){ productCache[code] = makeInfo(info.product); saveProdCache(); return productCache[code]; }
+
+      info = await fetchOFF(`https://world.openfoodfacts.org/api/v0/product/${encodeURIComponent(code)}.json`).catch(()=>null);
+      if(info && info.product){ productCache[code] = makeInfo(info.product); saveProdCache(); return productCache[code]; }
+
+      // Kein Treffer
+      productCache[code] = { product:null, brand:null, source:'none' };
+      saveProdCache();
+      return productCache[code];
+    }
+
+    async function fetchOFF(url){
+      const controller = new AbortController(); const t = setTimeout(()=>controller.abort(), 6000);
+      try{
+        const r = await fetch(url, { headers:{'Accept':'application/json'}, signal: controller.signal });
+        if(!r.ok) throw new Error('HTTP '+r.status);
+        return await r.json();
+      } finally { clearTimeout(t); }
+    }
+
+    async function fetchCustom(url, code){
+      const controller = new AbortController(); const t = setTimeout(()=>controller.abort(), 6000);
+      try{
+        // 1) GET mit Platzhalter {code} oder Query ?code=
+        let finalUrl = url.replace('{code}', encodeURIComponent(code));
+        if(!/\{code\}/.test(url)){
+          const sep = url.includes('?') ? '&' : '?';
+          finalUrl = url + sep + 'code=' + encodeURIComponent(code);
+        }
+        let r = await fetch(finalUrl, { headers:{'Accept':'application/json, text/plain;q=0.9'}, signal: controller.signal });
+        if(r.ok){
+          // Versuche JSON
+          const ct = (r.headers.get('content-type')||'').toLowerCase();
+          if(ct.includes('application/json')){
+            const j = await r.json().catch(()=>null);
+            if(j) return { product:(j.product||null), brand:(j.brand||null), source:'custom' };
+          }
+          // Fallback TEXT (z.B. OpenGTINdb)
+          const txt = await r.text().catch(()=>null);
+          const og = parseOpenGtinText(txt||'');
+          if(og) return og;
+        }
+        // 2) POST Fallback (JSON erwartet)
+        r = await fetch(url, { method:'POST', headers:{'Content-Type':'application/json','Accept':'application/json'}, body: JSON.stringify({ code }), signal: controller.signal });
+        if(r.ok){ const j = await r.json().catch(()=>null); if(j) return { product:(j.product||null), brand:(j.brand||null), source:'custom' }; }
+      } finally { clearTimeout(t); }
+      return null;
+    }
+
+    function parseOpenGtinText(txt){
+      if(!txt) return null;
+      // Beispiel: key=value Zeilen, Blöcke mit --- getrennt; erste Zeilen: error=0, ---
+      const lines = txt.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+      if(lines.length===0) return null;
+      const kv = {};
+      let started = false;
+      for(const line of lines){
+        if(line==='---'){ if(started) break; started = true; continue; }
+        if(!started && line.startsWith('error=')) { if(line!=='error=0') return null; continue; }
+        const m = line.match(/^([^=]+)=(.*)$/);
+        if(m){ kv[m[1].trim()] = m[2].trim(); }
+      }
+      const name = kv.detailname || kv.name || '';
+      const brand = kv.vendor || '';
+      const product = ((brand? brand+' ' : '') + name).trim();
+      if(!product) return null;
+      return { product, brand: brand||null, source:'opengtindb' };
+    }
+
+    async function sendToHA(code, dish='', productInfo){
+      const webhook = els.inpWebhook.value.trim();
+      const payload = { code, product: productInfo?.product||null, brand: productInfo?.brand||null, dish, ts:new Date().toISOString(), type:'scan' };
+
+      if(webhook){
+        const controller = new AbortController(); const t = setTimeout(()=>controller.abort(), 5000);
+        const r = await fetch(webhook, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload), signal: controller.signal });
+        clearTimeout(t);
+        if(!r.ok) throw new Error('Webhook HTTP '+r.status);
+        return;
+      }
+      // REST fallback
+      const base = els.inpBaseUrl.value.trim();
+      const token = els.inpToken.value.trim();
+      const service = els.inpService.value.trim();
+      const entity = els.inpEntity.value.trim();
+      if(!base || !token || !service || !entity){ toast('REST: Basis-URL/Token/Service/Entity fehlen'); return; }
+      const [domain, svc] = service.split('.');
+      const url = base.replace(/\/*$/,'') + `/api/services/${domain}/${svc}`;
+      const value = composeValueString(code, dish, productInfo?.product||'');
+      const body = { entity_id: entity, value };
+      const controller = new AbortController(); const t = setTimeout(()=>controller.abort(), 5000);
+      const r = await fetch(url, { method:'POST', headers:{ 'Authorization':`Bearer ${token}`, 'Content-Type':'application/json' }, body: JSON.stringify(body), signal: controller.signal });
+      clearTimeout(t);
+      if(!r.ok) throw new Error('REST HTTP '+r.status);
+    }
+
+    // --- Events ---
+    els.btnStart.addEventListener('click', start);
+    els.btnStop.addEventListener('click', stop);
+    els.btnTorch.addEventListener('click', toggleTorch);
+    els.selCam.addEventListener('change', async(e)=>{ currentDeviceId = e.target.value; saveSettings(); await stop(); await start(); });
+    for(const id of ['chkAutoSend','chkLookup','chkDedup','chkSound','inpWebhook','inpBaseUrl','inpToken','inpService','inpEntity','inpCustomLookup']){
+      const el = document.getElementById(id);
+      el.addEventListener('input', saveSettings);
+      el.addEventListener('change', saveSettings);
+    }
+    els.btnTestSend.addEventListener('click', async()=>{
+      const dish = (els.selDish?.value || '').trim();
+      const fake = { product:'Testprodukt', brand:'Demo' };
+      try{ await sendToHA('TEST-'+Math.random().toString(36).slice(2,7), dish, fake); toast('Test gesendet'); }
+      catch(e){ toast('Fehler: '+(e?.message||'unbekannt')); }
+    });
+    els.btnCopy.addEventListener('click', copyAll);
+    els.btnClear.addEventListener('click', ()=>{ els.list.innerHTML=''; });
+
+    // Lifecycle
+    window.addEventListener('pagehide', ()=>{ stop(); }, {capture:true});
+    document.addEventListener('visibilitychange', ()=>{ if(document.hidden) stop(); });
+    window.addEventListener('beforeunload', ()=>{ stop(); });
+    window.addEventListener('pageshow', (e)=>{ if(e.persisted) start(); });
+
+    loadSettings();
+    setBadge(false,'inaktiv');
+  </script>
+</body>
+</html>
