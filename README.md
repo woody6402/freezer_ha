@@ -41,7 +41,7 @@ separate file.
 ### 3. Dashboard screenshot
 
 ![Dashboard
-Screenshot](https://github.com/woody6402/freezer_ha/blob/main/Screenshot-20250903174802-1500x669.png)
+Screenshot](Screenshot-20250903174802-1500x669.png)
 
 ------------------------------------------------------------------------
 
